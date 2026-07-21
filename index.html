@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWATDR - Panel de Control</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            border-bottom: 4px solid #667eea;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        h1 {
+            color: #333;
+            font-size: 2.5em;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        h1 span {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 10px;
+            font-size: 0.5em;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+        .user-info .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .user-info .name {
+            font-weight: 600;
+            color: #333;
+        }
+        .user-info .role {
+            font-size: 12px;
+            color: #666;
+        }
+        .btn-logout {
+            padding: 8px 20px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-logout:hover {
+            background: #c82333;
+            transform: scale(1.05);
+        }
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+        .btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #f6d365, #fda085);
+            box-shadow: 0 4px 15px rgba(253, 160, 133, 0.4);
+            color: #333;
+        }
+        .btn-auth {
+            background: linear-gradient(135deg, #a18cd1, #fbc2eb);
+            box-shadow: 0 4px 15px rgba(161, 140, 209, 0.4);
+            color: #333;
+        }
+        #data-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            min-height: 400px;
+            overflow-x: auto;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+            padding: 60px 20px;
+            font-size: 1.2em;
+        }
+        .error {
+            color: #721c24;
+            background: #f8d7da;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #f5576c;
+        }
+        .success {
+            color: #155724;
+            background: #d4edda;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #28a745;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+            color: #333;
+        }
+        tr:hover {
+            background: #f1f3f5;
+        }
+        .table-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 150px;
+        }
+        .stat-card label {
+            display: block;
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .stat-card .number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+            margin-top: 5px;
+        }
+        .stat-card .number.green { color: #28a745; }
+        .stat-card .number.red { color: #dc3545; }
+        .stat-card .number.orange { color: #fd7e14; }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        .empty-state .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        .form-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .form-modal.active {
+            display: flex;
+        }
+        .form-modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .form-modal-content h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .form-modal-content input,
+        .form-modal-content select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        .form-modal-content input:focus,
+        .form-modal-content select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .form-modal-content .btn-group-modal {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .form-modal-content .btn {
+            flex: 1;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-badge.exitoso { background: #d4edda; color: #155724; }
+        .status-badge.fallido { background: #f8d7da; color: #721c24; }
+        .status-badge.bloqueado { background: #fff3cd; color: #856404; }
+        .status-badge.activo { background: #d4edda; color: #155724; }
+        .status-badge.agotado { background: #f8d7da; color: #721c24; }
+        .status-badge.urgente { background: #fff3cd; color: #856404; }
+        .status-badge.correcto { background: #d4edda; color: #155724; }
+        @media (max-width: 600px) {
+            .container { padding: 15px; }
+            h1 { font-size: 1.8em; }
+            .btn { padding: 10px 18px; font-size: 13px; }
+            th, td { padding: 8px 10px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛍️ SWATDR <span>Panel de Control</span></h1>
+            <div class="user-info" id="userInfo" style="display:none;">
+                <div class="avatar" id="userAvatar">👤</div>
+                <div>
+                    <div class="name" id="userName">Usuario</div>
+                    <div class="role" id="userRole">Rol</div>
+                </div>
+                <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+            </div>
+        </div>
+        
+        <div class="btn-group">
+            <button class="btn" onclick="fetchData('/api/productos')">📦 Productos</button>
+            <button class="btn" onclick="fetchData('/api/categorias')">📂 Categorías</button>
+            <button class="btn" onclick="fetchData('/api/usuarios')">👤 Usuarios</button>
+            <button class="btn" onclick="fetchData('/api/admin')">📊 Panel Admin</button>
+            <button class="btn" onclick="fetchData('/api/historial')">📜 Historial</button>
+            <button class="btn btn-auth" onclick="showLoginForm()">🔐 Login</button>
+            <button class="btn btn-auth" onclick="showRegisterForm()">📝 Registrar</button>
+            <button class="btn btn-success" onclick="fetchData('/api/auth/auditoria')">📋 Auditoría</button>
+            <button class="btn btn-warning" onclick="fetchData('/api/dashboard')">📈 Dashboard</button>
+            <button class="btn btn-danger" onclick="clearTable()">🗑️ Limpiar</button>
+        </div>
+
+        <div id="data-container">
+            <div class="loading">👈 Haz clic en un botón para ver los datos</div>
+        </div>
+    </div>
+
+    <!-- MODAL LOGIN -->
+    <div id="loginModal" class="form-modal">
+        <div class="form-modal-content">
+            <h2>🔐 Iniciar Sesión</h2>
+            <form id="loginForm" onsubmit="loginUser(event)">
+                <input type="email" id="loginEmail" placeholder="Correo electrónico" required>
+                <input type="password" id="loginPassword" placeholder="Contraseña" required>
+                <div class="btn-group-modal">
+                    <button type="button" class="btn btn-danger" onclick="closeModal('loginModal')">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Iniciar Sesión</button>
+                </div>
+            </form>
+            <div id="loginResult"></div>
+        </div>
+    </div>
+
+    <!-- MODAL REGISTRO -->
+    <div id="registerModal" class="form-modal">
+        <div class="form-modal-content">
+            <h2>📝 Registrar Usuario</h2>
+            <form id="registerForm" onsubmit="registerUser(event)">
+                <input type="text" id="registerNombre" placeholder="Nombre completo" required>
+                <input type="email" id="registerEmail" placeholder="Correo electrónico" required>
+                <input type="password" id="registerPassword" placeholder="Contraseña" required>
+                <select id="registerRol">
+                    <option value="Comprador">Comprador</option>
+                    <option value="Administrador">Administrador</option>
+                </select>
+                <div class="btn-group-modal">
+                    <button type="button" class="btn btn-danger" onclick="closeModal('registerModal')">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Registrar</button>
+                </div>
+            </form>
+            <div id="registerResult"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // VARIABLES GLOBALES
+        // ==========================================
+        let usuarioActual = null;
+
+        // ==========================================
+        // FUNCIONES DE DATOS
+        // ==========================================
+        
+        async function fetchData(endpoint) {
+            const container = document.getElementById('data-container');
+            container.innerHTML = '<div class="loading">Cargando datos...</div>';
+
+            try {
+                const response = await fetch(`http://localhost:3000${endpoint}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                
+                if (!data || data.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">📭</div>
+                            <h3>No hay datos disponibles</h3>
+                            <p>Intenta con otra consulta</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                renderTable(data, endpoint);
+
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="error">
+                        ❌ Error: ${error.message}
+                        <br><br>
+                        <small>¿Está corriendo el servidor? Ejecuta: node server.js</small>
+                    </div>
+                `;
+                console.error('Error:', error);
+            }
+        }
+
+        function renderTable(data, endpoint) {
+            const container = document.getElementById('data-container');
+            const columns = Object.keys(data[0]);
+            
+            let html = `<div class="table-title">📊 ${endpoint.replace('/api/', '').toUpperCase()}</div>`;
+            
+            let statsHtml = `<div class="stats">
+                <div class="stat-card">
+                    <label>Total Registros</label>
+                    <div class="number">${data.length}</div>
+                </div>
+                <div class="stat-card">
+                    <label>Columnas</label>
+                    <div class="number">${columns.length}</div>
+                </div>`;
+            
+            if (endpoint === '/api/dashboard') {
+                const row = data[0];
+                statsHtml += `
+                    <div class="stat-card">
+                        <label>Usuarios</label>
+                        <div class="number green">${row.total_usuarios || 0}</div>
+                    </div>
+                    <div class="stat-card">
+                        <label>Pedidos</label>
+                        <div class="number orange">${row.total_pedidos || 0}</div>
+                    </div>
+                    <div class="stat-card">
+                        <label>Ingresos</label>
+                        <div class="number green">$${row.ingresos_totales || 0}</div>
+                    </div>
+                `;
+            }
+            
+            if (endpoint === '/api/auth/auditoria') {
+                const exitosos = data.filter(r => r.estado === 'EXITOSO').length;
+                const fallidos = data.filter(r => r.estado === 'FALLIDO').length;
+                statsHtml += `
+                    <div class="stat-card">
+                        <label>Exitosos</label>
+                        <div class="number green">${exitosos}</div>
+                    </div>
+                    <div class="stat-card">
+                        <label>Fallidos</label>
+                        <div class="number red">${fallidos}</div>
+                    </div>
+                `;
+            }
+            
+            statsHtml += '</div>';
+            html += statsHtml;
+            
+            html += `<div style="max-height: 500px; overflow-y: auto;">`;
+            html += '<table>';
+            html += '<thead><tr>';
+            columns.forEach(col => {
+                let headerName = col.replace(/_/g, ' ').toUpperCase();
+                html += `<th>${headerName}</th>`;
+            });
+            html += '</tr></thead>';
+            
+            html += '<tbody>';
+            data.forEach(row => {
+                html += '<tr>';
+                columns.forEach(col => {
+                    let value = row[col];
+                    
+                    if (value === null || value === undefined) {
+                        value = '—';
+                    } else if (typeof value === 'object') {
+                        value = JSON.stringify(value);
+                    } else if (typeof value === 'number' && col.includes('precio')) {
+                        value = `$${value.toFixed(2)}`;
+                    } else if (typeof value === 'number' && col.includes('total')) {
+                        value = `$${value.toFixed(2)}`;
+                    } else if (col === 'estado' || col === 'estado_inventario') {
+                        const badgeClass = getBadgeClass(value);
+                        value = `<span class="status-badge ${badgeClass}">${value}</span>`;
+                    } else if (typeof value === 'string' && value.length > 50) {
+                        value = value.substring(0, 50) + '...';
+                    }
+                    
+                    html += `<td>${value}</td>`;
+                });
+                html += '</tr>';
+            });
+            html += '</tbody></table>';
+            html += '</div>';
+            
+            container.innerHTML = html;
+        }
+
+        function getBadgeClass(value) {
+            const v = String(value).toLowerCase();
+            if (v.includes('exitoso') || v === 'activo' || v === 'stock correcto') return 'exitoso';
+            if (v.includes('fallido') || v === 'agotado') return 'fallido';
+            if (v.includes('bloqueado')) return 'bloqueado';
+            if (v.includes('urgente') || v.includes('reabastecer')) return 'urgente';
+            if (v === 'stock correcto') return 'correcto';
+            return '';
+        }
+
+        function clearTable() {
+            const container = document.getElementById('data-container');
+            container.innerHTML = '<div class="loading">👈 Haz clic en un botón para ver los datos</div>';
+        }
+
+        // ==========================================
+        // FUNCIONES DE AUTENTICACIÓN
+        // ==========================================
+
+        function showLoginForm() {
+            document.getElementById('loginModal').classList.add('active');
+            document.getElementById('loginResult').innerHTML = '';
+        }
+
+        function showRegisterForm() {
+            document.getElementById('registerModal').classList.add('active');
+            document.getElementById('registerResult').innerHTML = '';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('form-modal')) {
+                e.target.classList.remove('active');
+            }
+        });
+
+        async function loginUser(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const contrasenia = document.getElementById('loginPassword').value;
+            
+            const resultDiv = document.getElementById('loginResult');
+            resultDiv.innerHTML = '<div class="loading">Verificando credenciales...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email, 
+                        contrasenia,
+                        ip: '192.168.1.100',
+                        user_agent: navigator.userAgent 
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    usuarioActual = data.usuario;
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            ✅ ${data.mensaje}
+                            <br>
+                            <strong>Usuario:</strong> ${data.usuario.nombre}
+                            <br>
+                            <strong>Rol:</strong> ${data.usuario.rol}
+                        </div>
+                    `;
+                    updateUserUI();
+                    setTimeout(() => {
+                        closeModal('loginModal');
+                        fetchData('/api/auth/auditoria');
+                    }, 2000);
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            ❌ ${data.mensaje}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        ❌ Error: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        async function registerUser(event) {
+            event.preventDefault();
+            
+            const nombre = document.getElementById('registerNombre').value;
+            const email = document.getElementById('registerEmail').value;
+            const contrasenia = document.getElementById('registerPassword').value;
+            const rol = document.getElementById('registerRol').value;
+            
+            const resultDiv = document.getElementById('registerResult');
+            resultDiv.innerHTML = '<div class="loading">Registrando usuario...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nombre, email, contrasenia, rol })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            ✅ ${data.mensaje}
+                            <br>
+                            <strong>ID Usuario:</strong> ${data.usuario_id}
+                        </div>
+                    `;
+                    setTimeout(() => {
+                        closeModal('registerModal');
+                        fetchData('/api/usuarios');
+                    }, 2000);
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            ❌ ${data.mensaje}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        ❌ Error: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        function updateUserUI() {
+            if (usuarioActual) {
+                document.getElementById('userInfo').style.display = 'flex';
+                document.getElementById('userName').textContent = usuarioActual.nombre;
+                document.getElementById('userRole').textContent = usuarioActual.rol;
+                document.getElementById('userAvatar').textContent = usuarioActual.nombre.charAt(0).toUpperCase();
+            }
+        }
+
+        function logout() {
+            usuarioActual = null;
+            document.getElementById('userInfo').style.display = 'none';
+            clearTable();
+        }
+
+        // ==========================================
+        // INICIALIZACIÓN
+        // ==========================================
+
+        window.onload = function() {
+            fetchData('/api/productos');
+        };
+    </script>
+</body>
+</html>
