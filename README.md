@@ -45,4 +45,30 @@ API completa para tienda departamental con autenticación, gestión de productos
 
 ---
 
-## 🏗️ Arquitectura
+
+---
+
+## 📦 Instalación
+
+### Requisitos previos
+
+- Node.js (v18 o superior)
+- PostgreSQL (local o en la nube)
+- npm
+
+### Pasos
+
+```bash
+# Clonar el repositorio
+git clone https://github.com/donovanoteinne-rgb/S.W.A.T.D.R.git
+cd S.W.A.T.D.R
+
+# Instalar dependencias
+npm install
+
+# Configurar variables de entorno
+cp .env.example .env
+# Edita .env con tus credenciales
+
+# Ejecutar el servidor
+node server.js
